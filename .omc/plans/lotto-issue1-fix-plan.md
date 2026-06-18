@@ -1,6 +1,6 @@
 # Implementation Plan — Fix Issue #1 (CRITICAL + MAJOR)
 
-**Status:** v3 — **PENDING APPROVAL** (not executed). Consensus: Architect pass-1 (4 must-fixes) + Critic pass-1 (1 CRITICAL + 4) — all incorporated & self-verified sound. Final independent Critic `APPROVE` pass deferred (Opus subagent session limit; re-runnable after reset). No source mutated; no executor delegated.
+**Status:** v3 — **IMPLEMENTED & VERIFIED (2026-06-19)**. All 10 findings (C1 + M1–M9) fixed; `pnpm verify` green (51 TS + 12 Py tests, up from 30 + 7; rank/exclusion coverage 100%). See **§8 Implementation status** for the per-finding fix→test map and the one operational follow-up (real seed rebuild requires dhlottery network access — 302/blocked from the build env). Prior consensus: Architect pass-1 (4 must-fixes) + Critic pass-1 (1 CRITICAL + 4) — all incorporated & self-verified.
 **Mode:** ralplan consensus, *deliberate* (data-integrity + production hot-path defect + public-contract change)
 **Scope:** C1 (CRITICAL) + M1–M9 (MAJOR) from GitHub Issue #1. MINOR/NIT/SECURITY out of scope except where a MAJOR fix subsumes one.
 **Baseline:** commit `afab567`; **verified green: 30 TS tests + 7 Py tests** (re-run locally this session, exit 0). Working tree has only a timestamp-only `schemas_generated.py` regeneration (codegen noise).
@@ -142,3 +142,26 @@ Every CRITICAL/MAJOR finding was reproduced by reading the actual source. **All 
 ## Appendix — Review disposition
 **Architect (v1→v2):** (1) date-aware truthful `fresh`; (2) post-codegen shape assertion; (3) CI-first; (4) explicit cap contract + preserve interior-gap throw — all adopted.
 **Critic (v2→v3):** (1, CRITICAL) **draw-time-aware estimate** — adopted (anchor at Sat 20:45 KST; fixes the ~21h/week false-`last-good`); (2) **clock-injection contract** + pre-draw-fresh / post-draw-pending test rows — adopted (Pre-mortem §1, C1.1, §4); (3) `SOURCE_BEHIND_CALENDAR` (diff≥2) test + multi-call cap-convergence test + `>K` behavior — adopted (§3 C1.1/C1.2, §4); (4) reframe M2 — fail-loud anchor is the **primary** fix, round-trip is defense-in-depth over existing `test_agent.py:54-60`; §4 wording aligned to `model_validate` first — adopted; (5) name M3 mechanism (Langfuse v3 `trace_context`/`update_current_trace`, identity not correlation) — adopted (§3 M3).
+
+---
+
+## 8. Implementation status (2026-06-19)
+
+**Gate:** `pnpm verify` exit 0 — agent:codegen → typecheck → lint → test → test:coverage → pytest. **51 TS tests** (shared 5, core 12, data 16, web 4, api 14; was 30) + **12 Py tests** (was 7). `rank.ts`/`exclusion.ts` coverage 100% (AC4 preserved). Baseline before work: 30 TS + 7 Py green.
+
+| ID | Fix (files) | Proof (tests) |
+|----|-------------|---------------|
+| **C1** | `provider.ts` `estimateLatestDrawNo()` (draw-moment anchor `2002-12-07T20:45+09:00`) + downward bounded probe in `latestDrawNo()`; `sync.ts` `SyncResult.{providerEstimate,syncErrorKind}` + non-throwing cap (`BACKFILL_CAP`, default 30) keeping the interior-gap throw; new pure `freshness.ts` `classifyFreshness`; `service.ts` injects provider + uses `classifyFreshness` | `data.test.ts`: estimate clock-matrix, probe overshoot + bounded, cap+convergence, classifyFreshness (a)-(e); `api.test.ts`: fresh reachable + PENDING_OFFICIAL_PUBLISH via injected provider; **interior-gap `DrawBackfillError` test unchanged & green** |
+| **M1** | `.github/workflows/ci.yml` (Node 22 + pnpm pinned + uv; `pnpm install --frozen-lockfile` → `uv sync` → `pnpm verify`); push/PR + concurrency cancel | workflow runs the same green gate on every push/PR |
+| **M2** | `generate_models.py`: silent `.replace()` → **fail-loud anchor checks** (raise on drift). Drift now test-caught via `zod-to-json-schema` parity test (kept `openApiDocument` hand-authored to preserve the Pydantic RootModel shape — pre-mortem §3 — so M2-B+fail-loud, the sanctioned fallback). Codegen output byte-identical modulo timestamp. (also subsumes MINOR m11) | `contract.test.ts`: count/luckyNumbers/LottoCombination bounds match Zod; `test_agent.py`: model_validate round-trip + non-ascending reject |
+| **M3** | `tracing.py` `Trace(trace_id=…)` adopts req.traceId as Langfuse **identity** (v3 `trace_context`, 32-hex map); `graph_explain.receive_context` passes `req.traceId` | `test_agent.py`: `Trace.trace_id == req.traceId` directly + wired through `receive_context` |
+| **M4** | `build-seed.ts` reuses the draw-moment estimate + downward probe → stops at the last *resolvable* draw, never throws on the not-yet-drawn week; surfaces interior gaps | tsx smoke: estimate=1228, probes, clean error (endpoint 302 here). **Operational follow-up:** run `pnpm seed:build` from an env with real dhlottery access to commit the full 1..N seed |
+| **M5** | `repository.ts` `saveResultCheck` wrapped in `BEGIN IMMEDIATE`/COMMIT/ROLLBACK (mirrors `saveRecommendations`) | `data.test.ts`: forced UPDATE failure → rollback, no orphan `result_checks`, status stays `pending` |
+| **M6** | `service.ts` `checkSavedRecommendation`: omitted `drawNo` + `latestDrawNo < targetDrawNo` → **409**; ranks the real target, never clamps to an earlier draw; explicit override preserved | `api.test.ts`: future target → 409; existing explicit-drawNo rank test still green |
+| **M7** | error handling already shipped in `main.tsx` (commit 991dc60); added a real **behavior test** (happy-dom + @testing-library/react), made `App` exportable + guarded bootstrap. (also subsumes MINOR m3) | `app-behavior.test.tsx`: `recommend` rejects → error surfaced, not stuck "Revealing…"; `ui-source.test.ts` retained |
+| **M8** | `llm.py` `response_format={"type":"json_object"}` (env-guarded `NIM_JSON_MODE`) + `max_tokens`; `graph_explain.py` `_strip_code_fences` before both `model_validate_json` calls | `test_agent.py`: fenced(lang), bare-fence, and plain JSON all parse without fallback; junk → fallback (existing) |
+| **M9** | `fast-check` added to `@lotto/core`; property test over generated lucky sets/counts (numRuns 25) | `generation.property.test.ts`: 6 ascending-unique, all lucky included, never historical jackpot, in-request unique |
+
+**No regression:** §0 contract (`agentClient.ts`) untouched; `data.test.ts` interior-gap + WAL, `agentClient.test.ts` 4 fallback branches, `test_agent.py` Pydantic shape, rank truth table — all green.
+
+**Working-tree notes (not committed — awaiting user):** source + tests across the 6 findings' files; new `.github/workflows/ci.yml`, `packages/data/src/freshness.ts`, `apps/web/src/app-behavior.test.tsx`, `packages/core/src/generation.property.test.ts`; dev-deps added (`zod-to-json-schema` in shared; `fast-check` in core; `@testing-library/react`/`@testing-library/dom`/`happy-dom` in web) → `pnpm-lock.yaml`; `schemas_generated.py` timestamp (codegen noise).
