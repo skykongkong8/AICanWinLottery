@@ -35,7 +35,7 @@ function formatNumbers(numbers: number[]) {
   return numbers.join(" · ");
 }
 
-function App() {
+export function App() {
   const [lucky, setLucky] = useState("7,11");
   const [count, setCount] = useState(5);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
@@ -477,4 +477,6 @@ function NumberBall({ number }: { number: number }) {
   return <span className="number-ball">{number}</span>;
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Guarded so importing this module under test (no #root) does not attempt to mount.
+const rootElement = document.getElementById("root");
+if (rootElement) createRoot(rootElement).render(<App />);
