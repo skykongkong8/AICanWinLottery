@@ -1,0 +1,23 @@
+{
+  "name": "@lotto/core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "pnpm run typecheck:pkg",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run test:pkg",
+    "test:coverage": "vitest run --coverage",
+    "typecheck:pkg": "tsc -p tsconfig.json --noEmit",
+    "test:pkg": "vitest run"
+  },
+  "dependencies": {
+    "@lotto/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.8",
+    "vitest": "^2.1.8"
+  }
+}

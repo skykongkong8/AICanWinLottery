@@ -1,0 +1,31 @@
+{
+  "requestId": "req_1",
+  "traceId": null,
+  "combinations": [
+    {
+      "id": "rec_1",
+      "numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "tags": [
+        "balanced"
+      ],
+      "stats": {
+        "sum": 21
+      }
+    }
+  ],
+  "stats": {
+    "historicalDraws": 3
+  },
+  "luckyNumbers": [
+    1,
+    2
+  ],
+  "targetDrawNo": 1200
+}

@@ -1,0 +1,11 @@
+{
+  "perCombination": [
+    {
+      "id": "rec_1",
+      "explanation": "Fun balanced pick.",
+      "tagNarration": "Balanced spread."
+    }
+  ],
+  "analysisSummary": "Entertainment-only summary.",
+  "fallbackUsed": false
+}

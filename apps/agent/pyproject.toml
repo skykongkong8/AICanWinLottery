@@ -1,0 +1,22 @@
+[project]
+name = "lotto-agent"
+version = "0.1.0"
+description = "Stateless explanation service for AICanWinLottery"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115.6",
+  "uvicorn>=0.32.1",
+  "pydantic>=2.10.3",
+  "httpx>=0.28.1",
+  "langchain>=0.3.11",
+  "langgraph>=0.2.59",
+  "langchain-openai>=0.2.12",
+  "langfuse>=2.56.0",
+  "datamodel-code-generator>=0.26.3"
+]
+[dependency-groups]
+dev = ["pytest>=8.3.4", "pytest-asyncio>=0.25.0", "ruff>=0.8.4"]
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+[tool.ruff]
+line-length = 100

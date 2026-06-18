@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "createdAt": "2026-06-17T13:10:45.988Z",
+  "updatedAt": "2026-06-17T13:47:40Z",
+  "briefPath": ".omc/ultragoal/brief.md",
+  "goalsPath": ".omc/ultragoal/goals.json",
+  "ledgerPath": ".omc/ultragoal/ledger.jsonl",
+  "claudeGoalMode": "aggregate",
+  "goals": [
+    {
+      "id": "G001-scaffold",
+      "title": "Scaffold",
+      "objective": "Set up polyglot pnpm/Turbo monorepo \u2014 packages/{core,data,shared}, apps/{web,api}, Python apps/agent, root tooling, tsconfig, env templates, .gitignore",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:40:08Z",
+      "startedAt": "2026-06-17T13:11:04.267Z",
+      "completedAt": "2026-06-17T13:40:08Z"
+    },
+    {
+      "id": "G002-shared",
+      "title": "Shared",
+      "objective": "packages/shared \u2014 Zod schemas, shared TS types, domain constants (1-45, 6 picks, KRW1000), disclaimer/responsible-use copy",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:40:35Z",
+      "startedAt": "2026-06-17T13:40:08Z",
+      "completedAt": "2026-06-17T13:40:35Z"
+    },
+    {
+      "id": "G003-core",
+      "title": "Core",
+      "objective": "packages/core \u2014 number generation, validation, exact-historical-jackpot exclusion, tagging, statistics; single source of truth with unit tests",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:40:35Z",
+      "startedAt": "2026-06-17T13:40:35Z",
+      "completedAt": "2026-06-17T13:40:35Z"
+    },
+    {
+      "id": "G004-data",
+      "title": "Data",
+      "objective": "packages/data \u2014 SQLite+Drizzle schema (draw_results, recommendations, result_checks), LotteryResultProvider interface, dhlottery JSON provider + committed seed backfill, migrations, WAL",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:42:51Z",
+      "startedAt": "2026-06-17T13:40:35Z",
+      "completedAt": "2026-06-17T13:42:51Z"
+    },
+    {
+      "id": "G005-api",
+      "title": "API",
+      "objective": "apps/api \u2014 hot-path POST /api/recommendations (resolve targetDrawNo, freshness sync, API generates numbers, one stateless /explain call, stamp fallbackUsed, disclaimers), POST /api/recommendations/save, dev POST /api/agent/run, read-only /internal/* tools, sole DB writer",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:44:27Z",
+      "startedAt": "2026-06-17T13:42:51Z",
+      "completedAt": "2026-06-17T13:44:27Z"
+    },
+    {
+      "id": "G006-agent",
+      "title": "Agent",
+      "objective": "apps/agent \u2014 Python LangGraph compact /explain graph + full six-node dev graph, NVIDIA NIM glm-5.1 via OpenAI-compatible base_url, Pydantic structured output, model-agnostic + graceful fallback, Langfuse hooks",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:46:29Z",
+      "startedAt": "2026-06-17T13:44:27Z",
+      "completedAt": "2026-06-17T13:46:29Z"
+    },
+    {
+      "id": "G007-web",
+      "title": "Web",
+      "objective": "apps/web \u2014 recommendation + result-tracking UI, 19+ responsible-use/entertainment-only UX, developer/traces screen",
+      "status": "complete",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:47:40Z",
+      "startedAt": "2026-06-17T13:46:29Z",
+      "completedAt": "2026-06-17T13:47:40Z"
+    },
+    {
+      "id": "G008-integrationverify",
+      "title": "IntegrationVerify",
+      "objective": "One-command dev (pnpm/Turbo + concurrent Python, no Docker), AC1-AC15 tests + CI gates, verify-before-build checklist incl. one live glm-5.1 call using NVIDIA_NIM_KEY + dhlottery reachability; final ai-slop-cleaner + verification + code-review gate",
+      "status": "in_progress",
+      "attempt": 1,
+      "createdAt": "2026-06-17T13:10:45.988Z",
+      "updatedAt": "2026-06-17T13:47:40Z",
+      "startedAt": "2026-06-17T13:47:40Z"
+    }
+  ],
+  "claudeObjective": "Complete all ultragoal stories in .omc/ultragoal/goals.json: G001-scaffold Scaffold; G002-shared Shared; G003-core Core; G004-data Data; G005-api API; G006-agent Agent; G007-web Web; G008-integrationverify IntegrationVerify",
+  "activeGoalId": "G008-integrationverify"
+}

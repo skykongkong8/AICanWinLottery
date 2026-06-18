@@ -1,0 +1,13 @@
+body { font-family: system-ui, sans-serif; margin: 0; background: #f6f7fb; color: #1c2430; }
+main { max-width: 960px; margin: auto; padding: 32px; }
+header { padding: 20px 0; }
+section, article, dialog { background: white; margin: 16px 0; padding: 16px; border-radius: 12px; box-shadow: 0 1px 8px #0001; }
+article { border: 1px solid #e6e8ef; }
+label { display: block; margin: 8px 0; }
+input { margin-left: 8px; padding: 8px; }
+button { margin: 6px 8px 6px 0; padding: 9px 12px; border: 0; border-radius: 8px; background: #155eef; color: white; cursor: pointer; }
+button.secondary { background: #344054; }
+.warning { color: #8a4b00; font-weight: 600; }
+.eyebrow { color: #155eef; text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; font-weight: 700; }
+code { white-space: pre-wrap; display: block; background: #101828; color: #e6f0ff; padding: 12px; border-radius: 8px; overflow-x: auto; }
+dialog { position: fixed; inset: 10% auto auto 50%; transform: translateX(-50%); max-width: 560px; border: 0; }

@@ -1,0 +1,26 @@
+{
+  "name": "@lotto/api",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "pnpm run typecheck:pkg",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run test:pkg",
+    "typecheck:pkg": "tsc -p tsconfig.json --noEmit",
+    "test:pkg": "vitest run"
+  },
+  "dependencies": {
+    "@lotto/core": "workspace:*",
+    "@lotto/data": "workspace:*",
+    "@lotto/shared": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
+  }
+}

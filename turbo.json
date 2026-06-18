@@ -1,0 +1,12 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "emit-openapi": { "outputs": ["openapi.json"] },
+    "codegen": { "dependsOn": ["@lotto/shared#emit-openapi"], "outputs": ["src/lotto_agent/schemas_generated.py"] },
+    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
+    "dev": { "cache": false, "persistent": true },
+    "lint": { "dependsOn": ["^build"] },
+    "test": { "dependsOn": ["^build"] },
+    "typecheck": { "dependsOn": ["^build"] }
+  }
+}

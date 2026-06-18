@@ -1,0 +1,1 @@
+Implement the Korean Lotto 6/45 AI recommendation and result-tracking service per .omc/plans/lotto-ai-implementation-plan.md (consensus-approved). API owns the numbers via packages/core; the Python agent is LLM-only via a single stateless /explain call. Use NVIDIA_NIM_KEY for live glm-5.1 LLM-enabled testing.

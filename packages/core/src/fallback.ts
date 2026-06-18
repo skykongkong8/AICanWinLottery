@@ -1,0 +1,3 @@
+import { DISCLAIMER, RESPONSIBLE_USE_COPY } from "@lotto/shared";
+export function fallbackExplanation(numbers: number[], tags: string[], luckyNumbers: number[] = []): { explanation: string; tagNarration: string } { const lucky = luckyNumbers.length ? ` It preserves your lucky number(s): ${luckyNumbers.join(", ")}.` : ""; return { explanation: `This entertainment-only pick (${numbers.join("-")}) balances simple historical-number patterns without claiming better odds.${lucky}`, tagNarration: `Tags: ${tags.join(", ")}.` }; }
+export function disclaimers(): string[] { return [DISCLAIMER, RESPONSIBLE_USE_COPY]; }

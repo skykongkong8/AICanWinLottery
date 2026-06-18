@@ -1,0 +1,29 @@
+{
+  "name": "aicanwinlottery",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm agent:codegen && concurrently -n api,agent,web -c blue,magenta,green \"pnpm --filter @lotto/api dev\" \"pnpm agent:dev\" \"pnpm --filter @lotto/web dev\"",
+    "agent:dev": "uv run --project apps/agent python -m lotto_agent.app",
+    "build": "pnpm -r build",
+    "test": "pnpm -r --sort build && pnpm -r test:pkg",
+    "test:coverage": "pnpm --filter @lotto/core test:coverage",
+    "typecheck": "pnpm -r --sort build && pnpm -r --workspace-concurrency=1 typecheck:pkg",
+    "lint": "node scripts/agent-tools-httpx-only.mjs && pnpm -r lint",
+    "shared:openapi": "pnpm --filter @lotto/shared emit-openapi",
+    "agent:codegen": "pnpm shared:openapi && pnpm shared:fixtures && uv run --project apps/agent python apps/agent/scripts/generate_models.py",
+    "verify": "pnpm agent:codegen && pnpm typecheck && pnpm lint && pnpm test && pnpm test:coverage && uv run --project apps/agent pytest apps/agent/tests",
+    "shared:fixtures": "pnpm --filter @lotto/shared emit-fixtures",
+    "seed:build": "pnpm exec tsx scripts/build-seed.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "concurrently": "^9.1.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2"
+  }
+}

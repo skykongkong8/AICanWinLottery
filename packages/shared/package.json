@@ -1,0 +1,24 @@
+{
+  "name": "@lotto/shared",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "pnpm run typecheck:pkg",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run test:pkg",
+    "emit-openapi": "tsx scripts/emit-openapi.ts",
+    "typecheck:pkg": "tsc -p tsconfig.json --noEmit",
+    "test:pkg": "vitest run",
+    "emit-fixtures": "tsx scripts/emit-fixtures.ts"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,9 @@
+export const LOTTO_MIN = 1;
+export const LOTTO_MAX = 45;
+export const LOTTO_PICK_COUNT = 6;
+export const MIN_RECOMMENDATION_COUNT = 1;
+export const MAX_RECOMMENDATION_COUNT = 5;
+export const GAME_PRICE_KRW = 1000;
+export const OFFICIAL_ONLINE_LIMIT_KRW = 5000;
+export const DISCLAIMER = "For entertainment only. Lotto odds are not improved or guaranteed. Purchase responsibly; official online purchase is for identity-verified adults aged 19+ and is limited by Donghaeng Lottery rules.";
+export const RESPONSIBLE_USE_COPY = "No purchase automation is provided. Copy your numbers manually and use only the official Donghaeng Lottery site if you choose to purchase.";

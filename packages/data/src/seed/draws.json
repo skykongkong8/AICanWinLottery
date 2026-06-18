@@ -1,0 +1,44 @@
+[
+  {
+    "drawNo": 1,
+    "date": "2002-12-07",
+    "numbers": [
+      10,
+      23,
+      29,
+      33,
+      37,
+      40
+    ],
+    "bonusNumber": 16,
+    "parserVersion": "seed-v1"
+  },
+  {
+    "drawNo": 2,
+    "date": "2002-12-14",
+    "numbers": [
+      9,
+      13,
+      21,
+      25,
+      32,
+      42
+    ],
+    "bonusNumber": 2,
+    "parserVersion": "seed-v1"
+  },
+  {
+    "drawNo": 3,
+    "date": "2002-12-21",
+    "numbers": [
+      11,
+      16,
+      19,
+      21,
+      27,
+      31
+    ],
+    "bonusNumber": 30,
+    "parserVersion": "seed-v1"
+  }
+]

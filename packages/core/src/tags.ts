@@ -1,0 +1,2 @@
+import type { CandidateStats } from "./statistics.js";
+export function tagsForStats(stats: CandidateStats): string[] { const tags: string[] = []; if (stats.odd === 3) tags.push("balanced odd/even"); if (stats.low && stats.mid && stats.high) tags.push("wide range"); if (stats.consecutivePairs === 0) tags.push("no consecutive pairs"); if (stats.sum >= 100 && stats.sum <= 170) tags.push("moderate sum"); if (tags.length === 0) tags.push("personalized pick"); return tags; }
