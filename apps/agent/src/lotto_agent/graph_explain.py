@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any, TypedDict
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, ValidationError
@@ -32,6 +33,18 @@ class ExplainState(TypedDict, total=False):
 def _append(state: ExplainState, name: str) -> list[str]:
     return [*(state.get("spans") or []), name]
 
+def _strip_code_fences(text: str) -> str:
+    """Unwrap a ```json ... ``` (or bare ```) markdown fence so model_validate_json succeeds.
+
+    Models often return fenced JSON even when asked for raw JSON; stripping the fence before
+    validation avoids a spurious fallback. Plain JSON passes through unchanged.
+    """
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        stripped = re.sub(r"^```[A-Za-z0-9_-]*\s*\n?", "", stripped)
+        stripped = re.sub(r"\n?\s*```\s*$", "", stripped)
+    return stripped.strip()
+
 def _fallback_response(req: ExplainRequest, summary: str = "Deterministic fallback explanations used.") -> ExplainResponse:
     return ExplainResponse(
         perCombination=[
@@ -62,7 +75,7 @@ def _json_prompt(req: ExplainRequest) -> str:
 
 def receive_context(state: ExplainState) -> ExplainState:
     req = state["request"]
-    trace = Trace("agent_explain", {"targetDrawNo": req.targetDrawNo, "requestId": req.requestId})
+    trace = Trace("agent_explain", {"targetDrawNo": req.targetDrawNo, "requestId": req.requestId}, trace_id=req.traceId)
     with trace.span("receive_context"):
         prompt = _json_prompt(req)
     return {"prompt": prompt, "spans": _append(state, "receive_context"), "trace": trace}
@@ -74,7 +87,7 @@ async def llm_explain(state: ExplainState) -> ExplainState:
         for _attempt in range(2):
             try:
                 text, secondary = await call_nim_with_optional_fallback(state["prompt"])
-                payload = LlmExplainPayload.model_validate_json(text)
+                payload = LlmExplainPayload.model_validate_json(_strip_code_fences(text))
                 if not _payload_has_exact_ids(state["request"], payload):
                     raise ValueError("LLM output id mismatch")
                 return {"llm_text": text, "secondary_model_used": secondary, "spans": _append(state, "llm_explain")}
@@ -100,7 +113,7 @@ def structure_output(state: ExplainState) -> ExplainState:
     req = state["request"]
     trace = state["trace"]
     with trace.span("structure_output", {"fallbackUsed": False, "secondaryModelUsed": bool(state.get("secondary_model_used"))}):
-        payload = LlmExplainPayload.model_validate_json(state["llm_text"])
+        payload = LlmExplainPayload.model_validate_json(_strip_code_fences(state["llm_text"]))
         if not _payload_has_exact_ids(req, payload):
             raise ValueError("LLM output id mismatch")
         response = ExplainResponse(

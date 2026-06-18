@@ -1,4 +1,5 @@
 import os
+from typing import Any
 import httpx
 
 class MissingNvidiaKey(RuntimeError):
@@ -18,11 +19,24 @@ async def call_nim(prompt: str, model: str | None = None) -> str:
     base = os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
     model = model or os.getenv("NVIDIA_MODEL", "z-ai/glm-5.1")
     timeout = float(os.getenv("NIM_CALL_TIMEOUT_SECONDS", "8"))
+    payload: dict[str, Any] = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "Return only valid JSON matching the requested schema; prose must be inside string fields."},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.4,
+        "max_tokens": int(os.getenv("NIM_MAX_TOKENS", "1024")),
+    }
+    # JSON mode keeps the model from wrapping output in prose/markdown. Env-guarded because not
+    # every NIM-hosted model accepts response_format; set NIM_JSON_MODE=0 to disable.
+    if os.getenv("NIM_JSON_MODE", "1") != "0":
+        payload["response_format"] = {"type": "json_object"}
     async with httpx.AsyncClient(timeout=timeout) as client:
         res = await client.post(
             f"{base}/chat/completions",
             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            json={"model": model, "messages": [{"role": "system", "content": "Return only valid JSON matching the requested schema; prose must be inside string fields."}, {"role": "user", "content": prompt}], "temperature": 0.4},
+            json=payload,
         )
         res.raise_for_status()
         data = res.json()
