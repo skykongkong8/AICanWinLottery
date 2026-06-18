@@ -15,9 +15,14 @@
     "lint": "node scripts/agent-tools-httpx-only.mjs && pnpm -r lint",
     "shared:openapi": "pnpm --filter @lotto/shared emit-openapi",
     "agent:codegen": "pnpm shared:openapi && pnpm shared:fixtures && uv run --project apps/agent python apps/agent/scripts/generate_models.py",
-    "verify": "pnpm agent:codegen && pnpm typecheck && pnpm lint && pnpm test && pnpm test:coverage && uv run --project apps/agent pytest apps/agent/tests",
+    "verify": "pnpm agent:codegen && pnpm typecheck && pnpm lint && pnpm test && pnpm test:coverage && uv run --project apps/agent pytest apps/agent/tests -m \"not live_nim\"",
     "shared:fixtures": "pnpm --filter @lotto/shared emit-fixtures",
-    "seed:build": "pnpm exec tsx scripts/build-seed.ts"
+    "seed:build": "pnpm exec tsx scripts/build-seed.ts",
+    "ci:prepare": "bash scripts/ci/check-codegen-drift.sh",
+    "ci:unit": "pnpm typecheck && pnpm lint && pnpm test && pnpm test:coverage && uv run --project apps/agent pytest apps/agent/tests -m \"not live_nim and not integration\"",
+    "ci:integration": "pnpm -r --sort build && pnpm --filter @lotto/api test:pkg && uv run --project apps/agent pytest apps/agent/tests -m integration",
+    "ci:live-nim": "bash scripts/ci/run-live-nim.sh",
+    "ci:readiness": "pnpm build"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

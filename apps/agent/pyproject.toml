@@ -18,5 +18,9 @@ dependencies = [
 dev = ["pytest>=8.3.4", "pytest-asyncio>=0.25.0", "ruff>=0.8.4"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+markers = [
+  "integration: tests that exercise HTTP/service boundaries with deterministic local dependencies",
+  "live_nim: tests that call the live NVIDIA NIM chat-completions API and require NVIDIA_NIM_KEY",
+]
 [tool.ruff]
 line-length = 100

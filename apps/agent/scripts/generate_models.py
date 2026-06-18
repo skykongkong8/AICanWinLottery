@@ -20,6 +20,10 @@ subprocess.run(
     check=True,
 )
 text = OUT.read_text(encoding="utf-8")
+text = text.replace(
+    next((line for line in text.splitlines() if line.startswith("#   timestamp:")), "#   timestamp: normalized"),
+    "#   timestamp: normalized",
+)
 
 # The ascending/unique invariant cannot be expressed in JSON Schema, so it is injected into the
 # generated Pydantic model here. Injection is anchored to exact substrings of datamodel-codegen's
