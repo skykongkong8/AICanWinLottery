@@ -131,9 +131,17 @@ export class SQLiteLotteryStore {
   async saveResultCheck(input: { recommendationId: string; drawNo: number; matchedNumbers: number[]; bonusMatched: boolean; rank: string }) {
     return this.serialize(() => {
       const row = { id: randomUUID(), checkedAt: new Date().toISOString(), ...input };
-      this.db.prepare("INSERT INTO result_checks (id,recommendation_id,draw_no,matched_numbers_json,bonus_matched,rank,checked_at) VALUES (?,?,?,?,?,?,?)")
-        .run(row.id, row.recommendationId, row.drawNo, JSON.stringify(row.matchedNumbers), row.bonusMatched ? 1 : 0, row.rank, row.checkedAt);
-      this.db.prepare("UPDATE recommendations SET status='checked' WHERE id=?").run(row.recommendationId);
+      const insert = this.db.prepare("INSERT INTO result_checks (id,recommendation_id,draw_no,matched_numbers_json,bonus_matched,rank,checked_at) VALUES (?,?,?,?,?,?,?)");
+      const markChecked = this.db.prepare("UPDATE recommendations SET status='checked' WHERE id=?");
+      this.db.exec("BEGIN IMMEDIATE");
+      try {
+        insert.run(row.id, row.recommendationId, row.drawNo, JSON.stringify(row.matchedNumbers), row.bonusMatched ? 1 : 0, row.rank, row.checkedAt);
+        markChecked.run(row.recommendationId);
+        this.db.exec("COMMIT");
+      } catch (err) {
+        this.db.exec("ROLLBACK");
+        throw err;
+      }
       return row;
     });
   }

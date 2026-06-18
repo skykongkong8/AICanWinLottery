@@ -66,3 +66,49 @@ def test_generated_contract_rejects_out_of_range_and_nonascending():
     bad["combinations"][0]["numbers"] = [1,2,3,4,6,5]
     with pytest.raises(ValidationError):
         ExplainRequest(**bad)
+
+def _valid_llm_payload(req: ExplainRequest) -> dict:
+    return {
+        "perCombination": [
+            {"id": c.id, "explanation": "Live-shaped explanation.", "tagNarration": "Live-shaped narration."}
+            for c in req.combinations
+        ],
+        "analysisSummary": "Live-shaped summary.",
+    }
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("wrap", [
+    lambda body: "```json\n" + body + "\n```",   # fenced with language tag (M8 fence strip)
+    lambda body: "```\n" + body + "\n```",         # bare fence
+    lambda body: body,                              # plain JSON still parses
+])
+async def test_llm_json_variants_parse_without_fallback(monkeypatch, wrap):
+    req = ExplainRequest(**json.loads((FIXTURES / "explain-request.json").read_text()))
+    text = wrap(json.dumps(_valid_llm_payload(req)))
+    async def stub(_prompt):
+        return text, False
+    monkeypatch.setattr("lotto_agent.graph_explain.call_nim_with_optional_fallback", stub)
+    res = await explain(req)
+    assert res.fallbackUsed is False
+    assert [p.id for p in res.perCombination] == [c.id for c in req.combinations]
+    assert res.perCombination[0].explanation == "Live-shaped explanation."
+
+def test_lotto_combination_codegen_round_trip_and_rejects_nonascending():
+    # Defense-in-depth over the codegen fail-loud anchor: the generated model must keep the nested
+    # .root shape model_utils consumes AND enforce the injected ascending/unique invariant.
+    from lotto_agent.schemas_generated import LottoCombination
+    combo = LottoCombination.model_validate([1, 2, 3, 4, 5, 6])
+    assert numbers_from_combination(combo) == [1, 2, 3, 4, 5, 6]
+    with pytest.raises(ValidationError):
+        LottoCombination.model_validate([1, 2, 3, 4, 6, 5])
+
+def test_trace_adopts_request_trace_id_as_identity():
+    from lotto_agent.tracing import Trace
+    from lotto_agent.graph_explain import receive_context
+    # Direct construction adopts the API-issued id as the trace's own identity.
+    t = Trace("agent_explain", {}, trace_id="11111111-2222-3333-4444-555555555555")
+    assert t.trace_id == "11111111-2222-3333-4444-555555555555"
+    # And it is wired through the graph's first node from req.traceId.
+    req = ExplainRequest(requestId="r", traceId="abcdef00-0000-4000-8000-000000000abc", combinations=[{"id": "rec_1", "numbers": [1, 2, 3, 4, 5, 6], "tags": ["balanced"], "stats": {}}], stats={}, luckyNumbers=[1], targetDrawNo=10)
+    out = receive_context({"request": req, "spans": []})
+    assert out["trace"].trace_id == req.traceId
